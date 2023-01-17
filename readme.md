@@ -1,4 +1,4 @@
-<h1>console-chat<h1>
+<h1>console-chat</h1>
 
 Usage:
 
