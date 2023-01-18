@@ -1,4 +1,4 @@
-# console-chat 0.1.0
+# console-chat 0.2.0
 
 ### Usage:
 

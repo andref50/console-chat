@@ -1,7 +1,8 @@
-import os
 import sys
 import socket
 import threading
+from UI import *
+
 
 if len(sys.argv) == 3:
     host = str(sys.argv[1])
@@ -10,23 +11,30 @@ else:
     print("Usar argumentos: host (no formato '127.0.0.1') e porta (int)")
     sys.exit()
 
-opr_sys = os.name
-if opr_sys == 'nt':
-    plat_commands = {
-        'CLEAR_SCREEN': 'cls'
-    }
-else:
-    plat_commands = {
-        'CLEAR_SCREEN': 'clear'
-    }
 
-os.system(plat_commands['CLEAR_SCREEN'])
+class ClientUI(UI):
+    def __init__(self):
+        super().__init__()
 
-nickname = input("Nickname: ")
+    def header(self):
+        print(self.header_title)
+
+
+client_ui = ClientUI()
+client_ui.start("CHAT SERVER", 150, 40, '3E')
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect((host, port))
+try:
+    print("Console chat 0.1.0")
+    print("Tentando conectar ao servidor...")
+    client.connect((host, port))
+except ConnectionRefusedError:
+    print(f"\nNão foi possível conectar ao servidor \033m488{host}:{port}.\n"
+          f"Verifique se o endereço e porta estão corretos e tente novamente.")
+    client.close()
+    sys.exit()
 
+nickname = input("Nickname: ")
 
 def receive():
     while True:
@@ -37,7 +45,6 @@ def receive():
             else:
                 print(message)
         except Exception as e:
-            print(f"Erro de conexão: {e}")
             client.close()
             sys.exit()
 
