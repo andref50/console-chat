@@ -29,7 +29,7 @@ try:
     print("Tentando conectar ao servidor...")
     client.connect((host, port))
 except ConnectionRefusedError:
-    print(f"\nNão foi possível conectar ao servidor \033m488{host}:{port}.\n"
+    print(f"\nNão foi possível conectar ao servidor {host}:{port}.\n"
           f"Verifique se o endereço e porta estão corretos e tente novamente.")
     client.close()
     sys.exit()

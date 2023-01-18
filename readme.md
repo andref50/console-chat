@@ -14,16 +14,14 @@
 
 ### Tasks to-do:
 
-- [ ] Separate class responsabilities:
-    - [ ] detach update ui function of server class
+- [x] Separate class responsabilities:
+    - [x] detach update ui function of server class
 - [ ] Divide classes into individual modules:
-    - [ ] UI
-    - [ ] server
-    - [ ] client
+    - [x] UI
     - [ ] app.py (?)
 - [ ] Implement communication between objects (app.py??)
 - [ ] Implement client functionalities:
    - [ ] UI
 - [ ] Implement interactive functionalities for the console (modules to test):
    - [ ] _cmd_ module
-   - [ ] _PyInquirer_ module
+   - [ ] _ctypes_ module for terminal manipulation (cursor position, etc)
