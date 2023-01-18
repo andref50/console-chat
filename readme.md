@@ -1,7 +1,4 @@
-# console-chat <font size='3'>(0.1.0)</font>
-
-
-----
+# console-chat 0.1.0
 
 ### Usage:
 
