@@ -7,19 +7,15 @@
 
 
 2) To start the server:  
-<code>python run_server.py xxx.xxx.xxx.xxx yyyy</code>, where:  
-   <code>xxx.xxx.xxx.xxx</code>: host IP\
+    <code>python run_server.py xxx.xxx.xxx.xxx yyyy</code> or  
+    <code>python run_client.py xxx.xxx.xxx.xxx yyyy</code>, where:
+<br>  
+    <code>xxx.xxx.xxx.xxx</code>: host IP\
    <code>YYYY</code>: host port (integer).
    
 
 ### Tasks to-do:
 
-- [x] Separate class responsabilities:
-    - [x] detach update ui function of server class
-- [ ] Divide classes into individual modules:
-    - [x] UI
-    - [ ] app.py (?)
-- [ ] Implement communication between objects (app.py??)
 - [ ] Implement client functionalities:
    - [ ] UI
 - [ ] Implement interactive functionalities for the console (modules to test):
