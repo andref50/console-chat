@@ -1,5 +1,26 @@
 import os
-from utils.utils import separator
+
+
+def separator(size):
+    print('-' * size)
+
+
+class colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+MSG_TOKEN_DECORATOR = {
+    'conn': colors.WARNING,
+    'disconn': colors.FAIL,
+    'msg': colors.OKBLUE
+}
 
 
 class UI:
@@ -21,22 +42,23 @@ class UI:
                 'CLEAR_SCREEN': 'clear'
             }
 
-    def _set_ui(self, header_title, width, height, color):
-        self.header_title, self.width, self.height, self.color = header_title, width, height, color
+    def _set_ui(self, width, height, color=None):
+        #self.color = color
+        self.width, self.height = width, height
 
         # set console size (x, y)
         cmd = f'mode {self.width},{self.height}'
         os.system(cmd)
 
         # set console color (ANSI)
-        color = f'color {self.color}'
-        os.system(color)
+        # color = f'color {self.color}'
+        # os.system(color)
 
-    def start(self, header_title, width, height, color):
+    def start(self, width, height, color=None):
         self._set_opsys()
-        self._set_ui(header_title, width, height, color)
+        self._set_ui(width, height)
 
-    def clear_screen(self):
+    def _clear_screen(self):
         os.system(self.os_commands['CLEAR_SCREEN'])
 
     def header(self, ):
