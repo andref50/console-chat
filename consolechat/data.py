@@ -7,7 +7,7 @@ class Protocol:
         return json.dumps(json_data)
 
     @staticmethod
-    def receive_data(bytes_data: str) -> dic:
+    def receive_data(bytes_data: str) -> dict:
         return json.loads(bytes_data)
 
     @staticmethod
