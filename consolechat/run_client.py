@@ -3,7 +3,7 @@ import sys
 import socket
 import threading
 
-from gui import ClientUI, colors, MSG_TOKEN_DECORATOR
+from gui import ClientUI, Colors, MSG_TOKEN_DECORATOR
 from data import sftp
 
 
@@ -14,7 +14,7 @@ if len(sys.argv) == 3:
     host = str(sys.argv[1])
     port = int(sys.argv[2])
 else:
-    print(f"{colors.WARNING}* Uso: \n   > python run_client.py host (no formato '127.0.0.1') porta (int).{colors.ENDC}")
+    print(f"{Colors.WARNING}* Uso: \n   > python run_client.py host (no formato '127.0.0.1') porta (int).{Colors.ENDC}")
     sys.exit()
 
 
@@ -28,7 +28,7 @@ try:
     client.connect((host, port))
 
 except ConnectionRefusedError:
-    print(f"\n{colors.FAIL}Não foi possível conectar ao servidor {host}:{port}.\n"
+    print(f"\n{Colors.FAIL}Não foi possível conectar ao servidor {host}:{port}.\n"
           f"Verifique se o endereço e porta estão corretos e tente novamente.")
     client.close()
     sys.exit()
@@ -49,9 +49,9 @@ def receive():
                 handshake = sftp.create_data('', header='handshake', sender=nickname)
                 client.send(sftp.send_data(handshake).encode('ascii'))
             else:
-                print(f"{MSG_TOKEN_DECORATOR[data['header']] if data['sender'] != nickname else colors.BOLD}"
+                print(f"{MSG_TOKEN_DECORATOR[data['header']] if data['sender'] != nickname else Colors.BOLD}"
                       f"{data['sender'] if data['sender'] != nickname else 'Você'}: {data['body']}"
-                      f"{colors.ENDC}")
+                      f"{Colors.ENDC}")
 
         except Exception as e:
             print(e)

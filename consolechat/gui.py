@@ -19,13 +19,6 @@ class Colors:
     UNDERLINE = '\033[4m'
 
 
-MSG_TOKEN_DECORATOR = {
-    'conn': colors.WARNING,
-    'disconn': colors.FAIL,
-    'msg': colors.ENDC
-}
-
-
 class UI:
     def __init__(self):
         self.width = int()
@@ -45,7 +38,7 @@ class UI:
                 'CLEAR_SCREEN': 'clear'
             }
 
-    def _set_ui(self, width, height, color=None):
+    def _set_ui(self, width, height):
         # self.color = color
         self.width, self.height = width, height
 
@@ -57,7 +50,7 @@ class UI:
         # color = f'color {self.color}'
         # os.system(color)
 
-    def start(self, width, height, color=None):
+    def start(self, width, height):
         self._set_opsys()
         self._set_ui(width, height)
 
@@ -78,7 +71,7 @@ class ServerUI(UI):
         # ascii_banner = pyfiglet.figlet_format("CHAT SERVER")
         # print(ascii_banner)
         print(f"{self.header_title} {__version__}\n")
-        print(f"{colors.OKGREEN}* Conectado em {self.server.host}:{self.server.port}{colors.ENDC}")
+        print(f"{Colors.OKGREEN}* Conectado em {self.server.host}:{self.server.port}{Colors.ENDC}")
         print(f"* Usuários conectados: {len(self.server.clients)}")
         separator(64)
 
@@ -93,7 +86,7 @@ class ServerUI(UI):
         print("\nEvents log (last 10):")
         filtered_list = [e for e in self.server.logger.get_log_events if e["header"] != "msg"]
         for event in filtered_list[-max_to_show:]:
-            print(f"{colors.WARNING}{event}{colors.ENDC}")
+            print(f"{Colors.WARNING}{event}{Colors.ENDC}")
 
     def print_log_messages(self, max_to_show=4):
         print("\nMessages log (last 10):")
@@ -116,11 +109,15 @@ class ClientUI(UI):
 
     def header(self):
         print(f"\n{self.header_title} {__version__}")
-        print(f"{colors.OKGREEN}Conectado!{colors.ENDC}\n")
+        print(f"{Colors.OKGREEN}Conectado!{Colors.ENDC}\n")
 
     def update(self):
         self._clear_screen()
         self.header()
 
 
-colors = Colors()
+MSG_TOKEN_DECORATOR = {
+    'conn': Colors.WARNING,
+    'disconn': Colors.FAIL,
+    'msg': Colors.ENDC
+}
