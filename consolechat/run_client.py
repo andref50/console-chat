@@ -45,12 +45,12 @@ def receive():
             json_data = sftp.receive_data(raw_data)
             data = sftp.convert_json_to_data(json_data)
 
-            if data.header == 'handshake':
+            if data["header"] == 'handshake':
                 handshake = sftp.create_data('', header='handshake', sender=nickname)
                 client.send(sftp.send_data(handshake).encode('ascii'))
             else:
-                print(f"{MSG_TOKEN_DECORATOR[data.header] if data.sender != nickname else colors.BOLD}"
-                      f"{data.sender if data.sender != nickname else 'Você'}: {data.body}"
+                print(f"{MSG_TOKEN_DECORATOR[data['header']] if data['sender'] != nickname else colors.BOLD}"
+                      f"{data['sender'] if data['sender'] != nickname else 'Você'}: {data['body']}"
                       f"{colors.ENDC}")
 
         except Exception as e:

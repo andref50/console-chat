@@ -12,34 +12,40 @@ class DataProtocol:
 
     @staticmethod
     def connection_data(client_name):
-        return Data(f"{client_name} entrou da sala.", header="conn", sender="server").data
+        data.set_attr(f"{client_name} entrou da sala.", header="conn", sender="server")
+        return data.data
 
     @staticmethod
     def disconnection_data(client_name):
-        return Data(f"{client_name} saiu da sala.", header="disconn", sender="server").data
+        data.set_attr(f"{client_name} saiu da sala.", header="disconn", sender="server")
+        return data.data
 
     @staticmethod
-    def convert_json_to_data(data):
-        return Data(data["body"], header=data["header"], sender=data["sender"])
+    def convert_json_to_data(json_data):
+        data.set_attr(json_data["body"], header=json_data["header"], sender=json_data["sender"])
+        return data.data
 
     @staticmethod
     def create_data(body: str, header: str = None, sender: str = None):
         if header is None or sender is None:
             raise Exception('data object cant be empty')
-        return Data(body, header=header, sender=sender).data
+        data.set_attr(body, header=header, sender=sender)
+        return data.data
 
 
-class Data(object):
+class Data:
     def __init__(self, *body: str, header: str = None, sender: str = None):
-        if header is None or sender is None:
-            raise Exception('data object cant be empty')
-        else:
-            self._header = header
-            self._sender = sender
+        self._header = header
+        self._sender = sender
         if body:
             self._body = body[0]
         else:
             self._body = ''
+
+    def set_attr(self, body, sender, header):
+        self._body = body
+        self._header = header
+        self._sender = sender
 
     @property
     def header(self):
@@ -62,3 +68,6 @@ class Data(object):
 
     def __repr__(self):
         return f"Data({self.header}, {self.sender}, {self.body})"
+
+
+data = Data('', '', '')

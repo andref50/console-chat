@@ -26,7 +26,7 @@ class Server:
         self.port = sport
 
         # logger object
-        self._logger = Logger(max_events=10)
+        self._logger = Logger(max_events=100)
 
         # holds all connected clients
         self._clients = list()
@@ -92,7 +92,7 @@ class Client:
         raw_data = self.client.recv(1024).decode('ascii')
         json_data = sftp.receive_data(raw_data)
         data = sftp.convert_json_to_data(json_data)
-        return data.data
+        return data
 
     def __repr__(self):
         return self.name
@@ -108,7 +108,7 @@ def run():
         client.send(sftp.send_data(handshake).encode('ascii'))
         raw_data = sftp.receive_data(client.recv(1024).decode('ascii'))
         json_data = sftp.convert_json_to_data(raw_data)
-        nickname = json_data.sender
+        nickname = json_data["sender"]
         new_client = Client(client, adress, nickname)
 
         server.connect_client(new_client)

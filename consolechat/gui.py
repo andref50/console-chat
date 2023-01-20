@@ -89,14 +89,16 @@ class ServerUI(UI):
             print(f'{index + 1:2} | {client.name:<40} | {client.addr[0]}:{client.addr[1]}')
         separator(64)
 
-    def print_log_events(self, max_to_show=10):
+    def print_log_events(self, max_to_show=5):
         print("\nEvents log (last 10):")
-        for event in filter(lambda e: e["header"] != 'msg', self.server.logger.get_log_events[-max_to_show:]):
+        filtered_list = [e for e in self.server.logger.get_log_events if e["header"] != "msg"]
+        for event in filtered_list[-max_to_show:]:
             print(f"{colors.WARNING}{event}{colors.ENDC}")
 
-    def print_log_messages(self, max_to_show=10):
+    def print_log_messages(self, max_to_show=4):
         print("\nMessages log (last 10):")
-        for message in filter(lambda e: e["header"] == 'msg', self.server.logger.get_log_events[-max_to_show:]):
+        filtered_list = [e for e in self.server.logger.get_log_events if e["header"] == "msg"]
+        for message in filtered_list[-max_to_show:]:
             print(message)
 
     def update(self):
