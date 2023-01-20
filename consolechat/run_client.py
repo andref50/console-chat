@@ -4,8 +4,9 @@ import json
 import socket
 import threading
 
-from consolechat.gui import UI, colors, MSG_TOKEN_DECORATOR
-from consolechat.version import __version__
+from gui import ClientUI, colors, MSG_TOKEN_DECORATOR
+from data import DataProtocol as protocol
+from data import Data
 
 
 # Used to force win terminal(cmd) accept ANSI colors.
@@ -19,27 +20,12 @@ else:
     sys.exit()
 
 
-class ClientUI(UI):
-    def __init__(self):
-        super().__init__()
-        self.header_title = "Chat client"
-
-    def header(self):
-        print(f"\n{self.header_title} {__version__}")
-        print(f"{colors.OKGREEN}Conectado!{colors.ENDC}\n")
-
-    def update(self):
-        self._clear_screen()
-        self.header()
-
-
 client_ui = ClientUI()
 client_ui.start(150, 40)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
-    print(f"Console chat {__version__}")
     print("Tentando conectar ao servidor...")
     client.connect((host, port))
 
@@ -57,14 +43,19 @@ nickname = input("Nickname: ")
 def receive():
     while True:
         try:
-            data = client.recv(1024).decode('ascii')
-            if data == 'NICKNAME':
-                client.send(nickname.encode('ascii'))
+            received_data = protocol.receive_data(client.recv(1024).decode('ascii'))
+            data = protocol.make_data(received_data)
+            #data = Data(received_data["body"], header=received_data["header"], sender=received_data["sender"])
+
+            if data.header == 'handshake':
+                handshake = Data(header="handshake", sender=str(nickname))
+                client.send(protocol.send_data(handshake.data).encode('ascii'))
+
             else:
-                message = json.loads(data)
-                print(f"{MSG_TOKEN_DECORATOR[message['header']]}"
-                      f"{message['sender']}: {message['body']}"
+                print(f"{MSG_TOKEN_DECORATOR[data.header] if data.sender != nickname else colors.BOLD}"
+                      f"{data.sender if data.sender != nickname else 'Você'}: {data.body}"
                       f"{colors.ENDC}")
+
         except Exception as e:
             print(e)
             client.close()
@@ -75,6 +66,7 @@ def write():
     while True:
         try:
             message = input("\n> ")
+
             json_message = {"header": "msg", "sender": nickname, "body": message}
             data = json.dumps(json_message).encode('ascii')
             client.sendall(data)
@@ -83,8 +75,9 @@ def write():
             pass
 
 
-receive_thread = threading.Thread(target=receive)
-receive_thread.start()
+if __name__ == "__main__":
+    receive_thread = threading.Thread(target=receive)
+    receive_thread.start()
 
-write_thread = threading.Thread(target=write)
-write_thread.start()
+    write_thread = threading.Thread(target=write)
+    write_thread.start()

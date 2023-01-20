@@ -1,13 +1,12 @@
 import os
 import sys
-import json
 import socket
 import threading
 
-from consolechat.logger import Logger
-from consolechat.gui import separator, colors, UI
-from consolechat.version import __version__
-
+from logger import Logger
+from gui import ServerUI
+from data import DataProtocol as protocol
+from data import Data
 
 # Used to force win terminal(cmd) accept ANSI colors.
 os.system("")
@@ -21,45 +20,6 @@ else:
     sys.exit()
 
 
-class ServerUI(UI):
-    def __init__(self, running_server):
-        super().__init__()
-        self.server = running_server
-        self.header_title = "Chat server"
-
-    def header(self):
-        # ascii_banner = pyfiglet.figlet_format("CHAT SERVER")
-        # print(ascii_banner)
-        print(f"{self.header_title} {__version__}\n")
-        print(f"{colors.OKGREEN}* Conectado em {self.server.host}:{self.server.port}{colors.ENDC}")
-        print(f"* Usuários conectados: {len(self.server.clients)}")
-        separator(64)
-
-    def active_clients(self):
-        columns = [' #', 'Name', 'IP']
-        print(f'{columns[0]} | {columns[1]:<40} | {columns[2]}')
-        for index, client in enumerate(self.server.clients):
-            print(f'{index + 1:2} | {client.name:<40} | {client.addr[0]}:{client.addr[1]}')
-        separator(64)
-
-    def print_log_events(self):
-        print("\nEvents log:")
-        for event in self.server.logger.get_log_events:
-            print(f"{colors.WARNING}{event}{colors.ENDC}")
-
-    def print_log_messages(self):
-        print("\nMessages log:")
-        for message in self.server.logger.get_log_messages:
-            print(message)
-
-    def update(self):
-        self._clear_screen()
-        self.header()
-        self.active_clients()
-        self.print_log_events()
-        self.print_log_messages()
-
-
 class Server:
     def __init__(self, shost, sport):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -67,20 +27,27 @@ class Server:
         self.port = sport
 
         # logger object
-        self.logger = Logger(max_events=10, max_log_messages=100)
+        self._logger = Logger(max_events=10, max_log_messages=100)
 
         # holds all connected clients
-        self.clients = list()
+        self._clients = list()
+
+    @property
+    def clients(self):
+        return self._clients
+
+    @property
+    def logger(self):
+        return self._logger
 
     def start(self):
         self.server.bind((self.host, self.port))
         self.server.listen()
 
     def broadcast(self, message):
-        json_message_dumps = json.dumps(message)
-        self.logger.log_message(json_message_dumps)
+        self._logger.log_message(message)
         for c in self.clients:
-            c.client.sendall(json_message_dumps.encode('ascii'))
+            c.client.sendall(message.encode('ascii'))
 
     def accept_connection(self):
         return self.server.accept()
@@ -91,36 +58,31 @@ class Server:
         thread = threading.Thread(target=self.handle, args=(client,))
         thread.start()
 
-        self.logger.log_event(f"{client.name} entrou na sala.")
-        self.broadcast({"header": "conn", "sender": "server", "body": f"{client.name} entrou na sala."})
+        connection_message = protocol.connection_data(client.name)
+        data = protocol.send_data(connection_message)
+        self._logger.log_event(data)
+        self.broadcast(data)
         ui.update()
 
     def disconnect_client(self, client):
         self.clients.remove(client)
         client.close_connection()
-        disconnection_message = {"header": "disconn", "sender": "server", "body": f"{client.name} saiu da sala."}
-        self.logger.log_event(f"{client.name} saiu da sala.")
-        self.broadcast(disconnection_message)
+
+        disconnection_message = protocol.disconnection_data(client.name)
+        data = protocol.send_data(disconnection_message)
+        self._logger.log_event(data)
+        self.broadcast(data)
         ui.update()
 
     def handle(self, client):
         while True:
             try:
                 message = client.receive()
-                print(message)
-                self.broadcast(message)
+                self.broadcast(protocol.send_data(message))
             except Exception as e:
                 self.disconnect_client(client)
                 break
-
-    def run(self):
-        while True:
             ui.update()
-            client, adress = server.accept_connection()
-            client.send('NICKNAME'.encode('ascii'))
-            nickname = client.recv(1024).decode('ascii')
-            new_client = Client(client, adress, nickname)
-            self.connect_client(new_client)
 
 
 class Client:
@@ -133,16 +95,31 @@ class Client:
         self.client.close()
 
     def receive(self):
-        return json.loads(self.client.recv(1024).decode('ascii'))
+        return protocol.receive_data(self.client.recv(1024))
 
     def __repr__(self):
         return self.name
 
 
-server = Server(host, port)
-server.start()
+# the app main loop
+def run():
+    while True:
+        ui.update()
 
-ui = ServerUI(server)
-ui.start(150, 40)
+        client, adress = server.accept_connection()
+        handshake = Data(header="handshake", sender="server")
+        client.send(protocol.send_data(handshake.data).encode('ascii'))
+        nickname = protocol.receive_data(client.recv(1024).decode('ascii'))
+        new_client = Client(client, adress, nickname["sender"])
 
-server.run()
+        server.connect_client(new_client)
+
+
+if __name__ == "__main__":
+    server = Server(host, port)
+    server.start()
+
+    ui = ServerUI(server)
+    ui.start(150, 40)
+
+    run()
