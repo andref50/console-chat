@@ -1,12 +1,10 @@
 import os
 import sys
-import json
 import socket
 import threading
 
 from gui import ClientUI, colors, MSG_TOKEN_DECORATOR
-from data import DataProtocol as protocol
-from data import Data
+from data import DataProtocol as sftp
 
 
 # Used to force win terminal(cmd) accept ANSI colors.
@@ -43,14 +41,13 @@ nickname = input("Nickname: ")
 def receive():
     while True:
         try:
-            received_data = protocol.receive_data(client.recv(1024).decode('ascii'))
-            data = protocol.make_data(received_data)
-            #data = Data(received_data["body"], header=received_data["header"], sender=received_data["sender"])
+            raw_data = client.recv(1024).decode('ascii')
+            json_data = sftp.receive_data(raw_data)
+            data = sftp.convert_json_to_data(json_data)
 
             if data.header == 'handshake':
-                handshake = Data(header="handshake", sender=str(nickname))
-                client.send(protocol.send_data(handshake.data).encode('ascii'))
-
+                handshake = sftp.create_data('', header='handshake', sender=nickname)
+                client.send(sftp.send_data(handshake).encode('ascii'))
             else:
                 print(f"{MSG_TOKEN_DECORATOR[data.header] if data.sender != nickname else colors.BOLD}"
                       f"{data.sender if data.sender != nickname else 'Você'}: {data.body}"
@@ -66,10 +63,9 @@ def write():
     while True:
         try:
             message = input("\n> ")
-
-            json_message = {"header": "msg", "sender": nickname, "body": message}
-            data = json.dumps(json_message).encode('ascii')
-            client.sendall(data)
+            json_message = sftp.create_data(message, header="msg", sender=nickname)
+            packet = sftp.send_data(json_message)
+            client.sendall(packet.encode('ascii'))
         except Exception as e:
             print(e)
             pass

@@ -3,12 +3,12 @@ import json
 
 class DataProtocol:
     @staticmethod
-    def send_data(raw_data):
-        return json.dumps(raw_data)
+    def send_data(json_data):
+        return json.dumps(json_data)
 
     @staticmethod
-    def receive_data(json_data):
-        return json.loads(json_data)
+    def receive_data(bytes_data):
+        return json.loads(bytes_data)
 
     @staticmethod
     def connection_data(client_name):
@@ -19,8 +19,14 @@ class DataProtocol:
         return Data(f"{client_name} saiu da sala.", header="disconn", sender="server").data
 
     @staticmethod
-    def make_data(data):
+    def convert_json_to_data(data):
         return Data(data["body"], header=data["header"], sender=data["sender"])
+
+    @staticmethod
+    def create_data(body: str, header: str = None, sender: str = None):
+        if header is None or sender is None:
+            raise Exception('data object cant be empty')
+        return Data(body, header=header, sender=sender).data
 
 
 class Data(object):
@@ -49,10 +55,10 @@ class Data(object):
 
     @property
     def data(self):
-        return self.__str__()
+        return {"header": self.header, "sender": self.sender, "body": self.body}
 
     def __str__(self):
-        return {"header": self.header, "sender": self.sender, "body": self.body}
+        return f'header: {self.header}, sender: {self.sender} , body: {self.body}'
 
     def __repr__(self):
         return f"Data({self.header}, {self.sender}, {self.body})"

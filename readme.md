@@ -1,4 +1,4 @@
-# console-chat 0.3.0
+# console-chat 0.4.0
 
 Console chat is a chat app that runs on terminal (as the name implies). The app is divided in 2 parts: a server script, a script that hosts the chat room, and a client script (to run on different terminal instance) to join and interact with the server and other clients.  
 <br>
@@ -13,10 +13,9 @@ Clients can send and receive simple text messages, with a basic UI that will be 
 
 2) To start the server:  
     <code>python run_server.py xxx.xxx.xxx.xxx yyyy</code> or  
-    <code>python run_client.py xxx.xxx.xxx.xxx yyyy</code>, where:
-<br>  
-        <code>xxx.xxx.xxx.xxx</code>: host IP  
-        <code>YYYY</code>: host port (integer).
+    <code>python run_client.py xxx.xxx.xxx.xxx yyyy</code>, where:  
+    <code>xxx.xxx.xxx.xxx</code>: host IP  
+    <code>YYYY</code>: host port (integer).
    
 
 ### Tasks to-do:

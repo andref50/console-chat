@@ -28,3 +28,13 @@
 - added Logger class
 - implemented logger object to log management on server side
 - client/server now send JSON data
+
+
+## [0.4.0]
+######2023-01-20
+
+- imporved and simplified Looger class
+- all information sent/received now are treated as and event by Logger class
+- improved DataProtocol class, methods now works in a clearer way
+- DataProtocol is now sftp (Simple Data Transfer Protocol)
+

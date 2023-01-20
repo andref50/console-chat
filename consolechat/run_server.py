@@ -5,8 +5,7 @@ import threading
 
 from logger import Logger
 from gui import ServerUI
-from data import DataProtocol as protocol
-from data import Data
+from data import DataProtocol as sftp
 
 # Used to force win terminal(cmd) accept ANSI colors.
 os.system("")
@@ -27,7 +26,7 @@ class Server:
         self.port = sport
 
         # logger object
-        self._logger = Logger(max_events=10, max_log_messages=100)
+        self._logger = Logger(max_events=10)
 
         # holds all connected clients
         self._clients = list()
@@ -45,9 +44,11 @@ class Server:
         self.server.listen()
 
     def broadcast(self, message):
-        self._logger.log_message(message)
+        self._logger.log_event(message)
+        packet = sftp.send_data(message)
         for c in self.clients:
-            c.client.sendall(message.encode('ascii'))
+            c.client.sendall(packet.encode('ascii'))
+        ui.update()
 
     def accept_connection(self):
         return self.server.accept()
@@ -58,31 +59,24 @@ class Server:
         thread = threading.Thread(target=self.handle, args=(client,))
         thread.start()
 
-        connection_message = protocol.connection_data(client.name)
-        data = protocol.send_data(connection_message)
-        self._logger.log_event(data)
-        self.broadcast(data)
-        ui.update()
+        connection_message = sftp.connection_data(client.name)
+        self.broadcast(connection_message)
 
     def disconnect_client(self, client):
         self.clients.remove(client)
         client.close_connection()
 
-        disconnection_message = protocol.disconnection_data(client.name)
-        data = protocol.send_data(disconnection_message)
-        self._logger.log_event(data)
-        self.broadcast(data)
-        ui.update()
+        disconnection_message = sftp.disconnection_data(client.name)
+        self.broadcast(disconnection_message)
 
     def handle(self, client):
         while True:
             try:
                 message = client.receive()
-                self.broadcast(protocol.send_data(message))
+                self.broadcast(message)
             except Exception as e:
                 self.disconnect_client(client)
                 break
-            ui.update()
 
 
 class Client:
@@ -95,7 +89,10 @@ class Client:
         self.client.close()
 
     def receive(self):
-        return protocol.receive_data(self.client.recv(1024))
+        raw_data = self.client.recv(1024).decode('ascii')
+        json_data = sftp.receive_data(raw_data)
+        data = sftp.convert_json_to_data(json_data)
+        return data.data
 
     def __repr__(self):
         return self.name
@@ -103,14 +100,16 @@ class Client:
 
 # the app main loop
 def run():
-    while True:
-        ui.update()
+    ui.update()
 
+    while True:
         client, adress = server.accept_connection()
-        handshake = Data(header="handshake", sender="server")
-        client.send(protocol.send_data(handshake.data).encode('ascii'))
-        nickname = protocol.receive_data(client.recv(1024).decode('ascii'))
-        new_client = Client(client, adress, nickname["sender"])
+        handshake = sftp.create_data('', header="handshake", sender="server")
+        client.send(sftp.send_data(handshake).encode('ascii'))
+        raw_data = sftp.receive_data(client.recv(1024).decode('ascii'))
+        json_data = sftp.convert_json_to_data(raw_data)
+        nickname = json_data.sender
+        new_client = Client(client, adress, nickname)
 
         server.connect_client(new_client)
 
