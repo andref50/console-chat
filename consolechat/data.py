@@ -11,12 +11,12 @@ class Protocol:
         return json.loads(bytes_data)
 
     @staticmethod
-    def connection_data(client_name: str) -> dict:
+    def connection_message(client_name: str) -> dict:
         _data.set_attr(f"{client_name} entrou da sala.", header="conn", sender="server")
         return _data.data
 
     @staticmethod
-    def disconnection_data(client_name: str) -> dict:
+    def disconnection_message(client_name: str) -> dict:
         _data.set_attr(f"{client_name} saiu da sala.", header="disconn", sender="server")
         return _data.data
 

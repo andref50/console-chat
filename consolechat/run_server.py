@@ -32,7 +32,7 @@ class Server:
         self.host = shost
         self.port = sport
 
-        # logger object
+        # Logger object: hold all the events that server broadcast
         self._logger = Logger(max_events=100)
 
         # holds all connected clients
@@ -53,6 +53,7 @@ class Server:
     def broadcast(self, message: dict) -> None:
         self._logger.log_event(message)
         packet = sftp.send_data(message)
+
         for c in self.clients:
             c.client.sendall(packet.encode('ascii'))
         ui.update()
@@ -66,14 +67,14 @@ class Server:
         thread = threading.Thread(target=self.handle, args=(client,))
         thread.start()
 
-        connection_message = sftp.connection_data(client.name)
+        connection_message = sftp.connection_message(client.name)
         self.broadcast(connection_message)
 
     def disconnect_client(self, client: Any) -> None:
         self.clients.remove(client)
         client.close_connection()
 
-        disconnection_message = sftp.disconnection_data(client.name)
+        disconnection_message = sftp.disconnection_message(client.name)
         self.broadcast(disconnection_message)
 
     def handle(self, client: Any) -> None:
