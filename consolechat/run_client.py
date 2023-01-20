@@ -4,7 +4,7 @@ import socket
 import threading
 
 from gui import ClientUI, colors, MSG_TOKEN_DECORATOR
-from data import DataProtocol as sftp
+from data import sftp
 
 
 # Used to force win terminal(cmd) accept ANSI colors.

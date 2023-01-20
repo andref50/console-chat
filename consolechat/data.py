@@ -1,40 +1,40 @@
 import json
 
 
-class DataProtocol:
+class Protocol:
     @staticmethod
-    def send_data(json_data):
+    def send_data(json_data: dict) -> str:
         return json.dumps(json_data)
 
     @staticmethod
-    def receive_data(bytes_data):
+    def receive_data(bytes_data: str) -> dic:
         return json.loads(bytes_data)
 
     @staticmethod
-    def connection_data(client_name):
-        data.set_attr(f"{client_name} entrou da sala.", header="conn", sender="server")
-        return data.data
+    def connection_data(client_name: str) -> dict:
+        _data.set_attr(f"{client_name} entrou da sala.", header="conn", sender="server")
+        return _data.data
 
     @staticmethod
-    def disconnection_data(client_name):
-        data.set_attr(f"{client_name} saiu da sala.", header="disconn", sender="server")
-        return data.data
+    def disconnection_data(client_name: str) -> dict:
+        _data.set_attr(f"{client_name} saiu da sala.", header="disconn", sender="server")
+        return _data.data
 
     @staticmethod
-    def convert_json_to_data(json_data):
-        data.set_attr(json_data["body"], header=json_data["header"], sender=json_data["sender"])
-        return data.data
+    def convert_json_to_data(json_data: dict) -> dict:
+        _data.set_attr(json_data["body"], header=json_data["header"], sender=json_data["sender"])
+        return _data.data
 
     @staticmethod
-    def create_data(body: str, header: str = None, sender: str = None):
+    def create_data(body: str, header: str = None, sender: str = None) -> dict:
         if header is None or sender is None:
             raise Exception('data object cant be empty')
-        data.set_attr(body, header=header, sender=sender)
-        return data.data
+        _data.set_attr(body, header=header, sender=sender)
+        return _data.data
 
 
 class Data:
-    def __init__(self, *body: str, header: str = None, sender: str = None):
+    def __init__(self, body: list = '', header: str = None, sender: str = None):
         self._header = header
         self._sender = sender
         if body:
@@ -70,4 +70,5 @@ class Data:
         return f"Data({self.header}, {self.sender}, {self.body})"
 
 
-data = Data('', '', '')
+_data = Data()
+sftp = Protocol()

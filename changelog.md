@@ -30,11 +30,12 @@
 - client/server now send JSON data
 
 
-## [0.4.0]
+## [0.4.1]
 ######2023-01-20
 
 - imporved and simplified Logger class
 - all information sent/received now are treated as and event by Logger class
 - improved DataProtocol class, methods now works in a clearer way
 - DataProtocol is now sftp (Simple Data Transfer Protocol)
+- added types annotation and start docstringing
 

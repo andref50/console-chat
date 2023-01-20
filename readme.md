@@ -1,4 +1,4 @@
-# console-chat 0.4.0
+# console-chat 0.4.1
 
 Console chat is a chat app that runs on terminal (as the name implies). The app is divided in 2 parts: a server script, a script that hosts the chat room, and a client script (to run on different terminal instance) to join and interact with the server and other clients.  
 <br>

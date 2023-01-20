@@ -5,12 +5,14 @@ import threading
 
 from logger import Logger
 from gui import ServerUI
-from data import DataProtocol as sftp
+from data import sftp
 
 # Used to force win terminal(cmd) accept ANSI colors.
 os.system("")
 
-
+"""
+Receive host and port number from command-line
+"""
 if len(sys.argv) == 3:
     host = str(sys.argv[1])
     port = int(sys.argv[2])
@@ -43,7 +45,7 @@ class Server:
         self.server.bind((self.host, self.port))
         self.server.listen()
 
-    def broadcast(self, message):
+    def broadcast(self, message: dict):
         self._logger.log_event(message)
         packet = sftp.send_data(message)
         for c in self.clients:

@@ -7,7 +7,7 @@ def separator(size):
     print('-' * size)
 
 
-class colors:
+class Colors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
@@ -64,7 +64,7 @@ class UI:
     def _clear_screen(self):
         os.system(self.os_commands['CLEAR_SCREEN'])
 
-    def header(self, ):
+    def header(self):
         pass
 
 
@@ -121,3 +121,6 @@ class ClientUI(UI):
     def update(self):
         self._clear_screen()
         self.header()
+
+
+colors = Colors()
