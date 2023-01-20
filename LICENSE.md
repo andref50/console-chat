@@ -1,6 +1,6 @@
 The MIT License
 
-Copyright © 2023 André Francico
+Copyright © 2023 Andre Francico
 
 Permission is hereby granted, free of charge, to any person  
 obtaining a copy of This software and associated documentation  
