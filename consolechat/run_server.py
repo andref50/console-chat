@@ -2,6 +2,7 @@ import os
 import sys
 import socket
 import threading
+from typing import Any
 
 from logger import Logger
 from gui import ServerUI
@@ -22,7 +23,11 @@ else:
 
 
 class Server:
-    def __init__(self, shost, sport):
+    def __init__(
+            self,
+            shost: str,
+            sport: int
+    ) -> None:
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.host = shost
         self.port = sport
@@ -31,31 +36,31 @@ class Server:
         self._logger = Logger(max_events=100)
 
         # holds all connected clients
-        self._clients = list()
+        self._clients = []
 
     @property
-    def clients(self):
+    def clients(self) -> list:
         return self._clients
 
     @property
-    def logger(self):
+    def logger(self) -> Any:
         return self._logger
 
-    def start(self):
+    def start(self) -> None:
         self.server.bind((self.host, self.port))
         self.server.listen()
 
-    def broadcast(self, message: dict):
+    def broadcast(self, message: dict) -> None:
         self._logger.log_event(message)
         packet = sftp.send_data(message)
         for c in self.clients:
             c.client.sendall(packet.encode('ascii'))
         ui.update()
 
-    def accept_connection(self):
+    def accept_connection(self) -> tuple:
         return self.server.accept()
 
-    def connect_client(self, client):
+    def connect_client(self, client: Any) -> None:
         self.clients.append(client)
 
         thread = threading.Thread(target=self.handle, args=(client,))
@@ -64,14 +69,14 @@ class Server:
         connection_message = sftp.connection_data(client.name)
         self.broadcast(connection_message)
 
-    def disconnect_client(self, client):
+    def disconnect_client(self, client: Any) -> None:
         self.clients.remove(client)
         client.close_connection()
 
         disconnection_message = sftp.disconnection_data(client.name)
         self.broadcast(disconnection_message)
 
-    def handle(self, client):
+    def handle(self, client: Any) -> None:
         while True:
             try:
                 message = client.receive()
@@ -82,26 +87,32 @@ class Server:
 
 
 class Client:
-    def __init__(self, client, addr, name):
+    def __init__(
+            self,
+            client: Any,
+            addr: str,
+            name: str
+    ) -> None:
+
         self.client = client
         self.addr = addr
         self.name = name
 
-    def close_connection(self):
+    def close_connection(self) -> None:
         self.client.close()
 
-    def receive(self):
+    def receive(self) -> dict:
         raw_data = self.client.recv(1024).decode('ascii')
         json_data = sftp.receive_data(raw_data)
         data = sftp.convert_json_to_data(json_data)
         return data
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.name
 
 
 # the app main loop
-def run():
+def run() -> None:
     ui.update()
 
     while True:

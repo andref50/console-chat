@@ -38,7 +38,7 @@ client_ui.update()
 nickname = input("Nickname: ")
 
 
-def receive():
+def receive() -> None:
     while True:
         try:
             raw_data = client.recv(1024).decode('ascii')
@@ -59,7 +59,7 @@ def receive():
             sys.exit()
 
 
-def write():
+def write() -> None:
     while True:
         try:
             message = input("\n> ")
