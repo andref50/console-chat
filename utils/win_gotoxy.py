@@ -5,7 +5,8 @@ STD_OUTPUT_HANDLE = -11
 
 
 class COORD(Structure):
-    _fields_ = [("x", c_short),("y", c_short)]
+    _fields_ = [("x", c_short), ("y", c_short)]
+
 
 def print_at(r, c, s):
     os.system('cls')

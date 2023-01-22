@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 
 class Protocol:
@@ -28,24 +29,33 @@ class Protocol:
     @staticmethod
     def create_data(body: str, header: str = None, sender: str = None) -> dict:
         if header is None or sender is None:
-            raise Exception('data object cant be empty')
+            raise Exception('Neither \"header\" or \"sender\" can\'t be empty.')
         _data.set_attr(body, header=header, sender=sender)
         return _data.data
 
 
 class Data:
-    def __init__(self, body: list = '', header: str = None, sender: str = None):
+    def __init__(self, *body: list, header: str = None, sender: str = None):
         self._header = header
         self._sender = sender
-        if body:
-            self._body = body[0]
-        else:
-            self._body = ''
+
+        self._body = body[0] if body else ''
+
+        self._time: str = str()
 
     def set_attr(self, body, sender, header):
         self._body = body
         self._header = header
         self._sender = sender
+
+        self._set_timestamp()
+
+    def _set_timestamp(self) -> None:
+        actual_time = datetime.now()
+        self._time = actual_time.strftime("%Y-%m-%d %H:%M:%S")
+
+    def get_time(self) -> str:
+        return self._time
 
     @property
     def header(self):
@@ -61,14 +71,23 @@ class Data:
 
     @property
     def data(self):
-        return {"header": self.header, "sender": self.sender, "body": self.body}
+        return {"time": self._time, "header": self.header, "sender": self.sender, "body": self.body}
 
     def __str__(self):
-        return f'header: {self.header}, sender: {self.sender} , body: {self.body}'
+        return f'time: {self._time}, header: {self.header}, sender: {self.sender} , body: {self.body}'
 
     def __repr__(self):
-        return f"Data({self.header}, {self.sender}, {self.body})"
+        return f"Data({self._time}, {self.header}, {self.sender}, {self.body})"
 
 
+'''
+Create a singleton-like object of the "Data" class,
+to be used internally by this module only.
+'''
 _data = Data()
+
+'''
+Create a singleton-like object of the "Protocol" class,
+to be used externally through the app.
+'''
 sftp = Protocol()

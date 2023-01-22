@@ -5,21 +5,8 @@ import threading
 from typing import Any
 
 from logger import Logger
-from gui import ServerUI
+from gui import ServerUI, Colors
 from data import sftp
-
-# Used to force win terminal(cmd) accept ANSI colors.
-os.system("")
-
-"""
-Receive host and port number from command-line
-"""
-if len(sys.argv) == 3:
-    host = str(sys.argv[1])
-    port = int(sys.argv[2])
-else:
-    print("Usar os argumentos: host (no formato '127.0.0.1') e porta (int).")
-    sys.exit()
 
 
 class Server:
@@ -118,17 +105,43 @@ def run() -> None:
 
     while True:
         client, adress = server.accept_connection()
+
         handshake = sftp.create_data('', header="handshake", sender="server")
-        client.send(sftp.send_data(handshake).encode('ascii'))
+        handshake_json = sftp.send_data(handshake)
+        client.send(handshake_json.encode('ascii'))
+
         raw_data = sftp.receive_data(client.recv(1024).decode('ascii'))
         json_data = sftp.convert_json_to_data(raw_data)
+
         nickname = json_data["sender"]
         new_client = Client(client, adress, nickname)
-
         server.connect_client(new_client)
 
 
 if __name__ == "__main__":
+
+    """
+    Force windows terminal(cmd) accept ANSI commands.
+    """
+    os.system("")
+
+    """
+    Receive host and port number from command-line
+    """
+    if len(sys.argv) == 3:
+        host = str(sys.argv[1])
+        port = int(sys.argv[2])
+    else:
+        print(f"{Colors.WARNING}\n"
+              "* Uso:\n"
+              "> run_server.py xxx.xxx.xxx.xxx YYYY, onde:\n\n"
+              "     xxx.xxx.xxx.xxx: endereço IP\n"
+              f"                YYYY: porta{Colors.WARNING}")
+        sys.exit()
+
+    """
+    Start server, ui and run the app.
+    """
     server = Server(host, port)
     server.start()
 

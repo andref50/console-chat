@@ -2,7 +2,7 @@
 
 
 ## [0.1.0]
-######2023-01-17
+###### 2023-01-17
 
 - implements basic connection and message exchange functionalities
 - implements server and client objects on server side
@@ -10,7 +10,7 @@
 
 
 ## [0.2.0]
-######2023-01-18
+###### 2023-01-18
 
 - fixed server **"lost connection"** message
 - added client **"can't reach host error"** message
@@ -21,7 +21,7 @@
   
 
 ## [0.3.0]
-######2023-01-19
+###### 2023-01-19
 
 - new gui.py is the former ui.py module
 - fixed modules paths
@@ -31,11 +31,17 @@
 
 
 ## [0.4.1]
-######2023-01-20
+###### 2023-01-20
 
-- imporved and simplified Logger class
+- improved and simplified Logger class
 - all information sent/received now are treated as and event by Logger class
 - improved DataProtocol class, methods now works in a clearer way
 - DataProtocol is now sftp (Simple Data Transfer Protocol)
 - added types annotation and start docstringing
 
+## [0.4.2]
+###### 2023-01-21
+
+- minor changes in annotation
+- moved global variables and initializations to inside "if __main__" function
+- added time to data structure
