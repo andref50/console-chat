@@ -2,14 +2,23 @@ import os
 import sys
 import socket
 import threading
-from typing import Any
 
-from logger import Logger
-from gui import ServerUI, Colors
 from data import sftp
+from server_ui import server_ui
+from events import event_handler
+from decorators import Colors
+from clients import clients_database
+
+from log_listener import setup_log_event_handlers
+from broadcast_listener import setup_broadcast_event_handlers
+from server_ui_listener import setup_ui_event_handlers
 
 
 class Server:
+    """
+    The class responsible for handling all new connections and messages.
+    """
+
     def __init__(
             self,
             shost: str,
@@ -19,65 +28,66 @@ class Server:
         self.host = shost
         self.port = sport
 
-        # Logger object: hold all the events that server broadcast
-        self._logger = Logger(max_events=100)
+        # Clients database object: holds all connected clients
+        self._clients_database = clients_database
 
-        # holds all connected clients
-        self._clients = []
+        self.server_ui = server_ui
 
     @property
     def clients(self) -> list:
-        return self._clients
-
-    @property
-    def logger(self) -> Any:
-        return self._logger
+        return self._clients_database.active_clients()
 
     def start(self) -> None:
         self.server.bind((self.host, self.port))
         self.server.listen()
 
-    def broadcast(self, message: dict) -> None:
-        self._logger.log_event(message)
-        packet = sftp.send_data(message)
-
-        for c in self.clients:
-            c.client.sendall(packet.encode('ascii'))
-        ui.update()
-
     def accept_connection(self) -> tuple:
         return self.server.accept()
 
-    def connect_client(self, client: Any) -> None:
-        self.clients.append(client)
+    def connect_client(self, client) -> None:
+        self._clients_database.add_client(client)
 
         thread = threading.Thread(target=self.handle, args=(client,))
         thread.start()
 
-        connection_message = sftp.connection_message(client.name)
-        self.broadcast(connection_message)
+        # Post a "client connected to server event" to event handler object
+        event_handler.post_event("connect-client", client)
 
-    def disconnect_client(self, client: Any) -> None:
-        self.clients.remove(client)
+        #
+        # TO-DO: remove this method from here, it needs to be server-independet
+        #
+        # ui.update()
+
+    def disconnect_client(self, client) -> None:
+        self._clients_database.remove_client(client)
         client.close_connection()
 
-        disconnection_message = sftp.disconnection_message(client.name)
-        self.broadcast(disconnection_message)
+        # Post a "client disconnected from server event" to event handler object
+        event_handler.post_event("disconnect-client", client)
 
-    def handle(self, client: Any) -> None:
+        #
+        # TO-DO: remove this method from here, it needs to be server-independet
+        #
+        # ui.update()
+
+    def handle(self, client) -> None:
         while True:
             try:
                 message = client.receive()
-                self.broadcast(message)
+                event_handler.post_event("message", message)
             except Exception as e:
                 self.disconnect_client(client)
                 break
 
 
 class Client:
+    """
+    The Client object
+    """
+
     def __init__(
             self,
-            client: Any,
+            client,
             addr: str,
             name: str
     ) -> None:
@@ -99,9 +109,10 @@ class Client:
         return self.name
 
 
-# the app main loop
 def run() -> None:
-    ui.update()
+    """
+    The app main loop
+    """
 
     while True:
         client, adress = server.accept_connection()
@@ -120,14 +131,10 @@ def run() -> None:
 
 if __name__ == "__main__":
 
-    """
-    Force windows terminal(cmd) accept ANSI commands.
-    """
+    # Force windows terminal(cmd) accept ANSI commands.
     os.system("")
 
-    """
-    Receive host and port number from command-line
-    """
+    # Receive host and port number from command-line
     if len(sys.argv) == 3:
         host = str(sys.argv[1])
         port = int(sys.argv[2])
@@ -139,13 +146,12 @@ if __name__ == "__main__":
               f"                YYYY: porta{Colors.WARNING}")
         sys.exit()
 
-    """
-    Start server, ui and run the app.
-    """
+    # Start server, ui, event handler and run the app.
     server = Server(host, port)
     server.start()
 
-    ui = ServerUI(server)
-    ui.start(150, 40)
+    setup_log_event_handlers()
+    setup_broadcast_event_handlers()
+    setup_ui_event_handlers()
 
     run()

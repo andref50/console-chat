@@ -45,3 +45,10 @@
 - minor changes in annotation
 - moved global variables and initializations to inside "if __main__" function
 - added time to data structure
+
+## [0.5.0]
+###### 2023-01-28
+
+- added an event handler model, now server can post an event, and event handler  
+object take care of log, broadcast and ui update (so far).
+- classes are now divided by responsabilities, follow the Model, View, Controller principle.

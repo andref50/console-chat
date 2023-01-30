@@ -1,7 +1,10 @@
+__all__ = ['log']
+
+
 class Logger:
     """
-        The Logger objct holds all the events sended by the server.
-        The "max_events" events set the Logger max events capacity.
+        The Logger object holds all the events in the server.
+        "max_events" set max events capacity (default is 100 events).
     """
 
     def __init__(self, max_events: int = 100) -> None:
@@ -23,3 +26,6 @@ class Logger:
 
     def __repr__(self) -> str:
         return f"Logger({self._max_log_events = }, {len(self._log_events) = }"
+
+
+log = Logger(max_events=100)

@@ -1,27 +1,18 @@
-# console-chat 0.4.2
+# console-chat 0.5.0
 
-Console chat is a chat app that runs on terminal (as the name implies). The app is divided in 2 parts: a server script, a script that hosts the chat room, and a client script (to run on different terminal instance) to join and interact with the server and other clients.  
+Console chat is a chat app that runs on terminal. The app has 2 scripts: the run_server.py, which hosts the chat room, and the run_client.py script (that runs on a different terminal instance), which join the chat room and allow sending and receive text messages.  
 <br>
-At the moment the server can hold an unlimited number of clients, and have a basic UI to monitor activity: a list of clients with their names, IP and port, and a event log and message log area.  
+The server can hold an unlimited number of clients, and have a basic UI to monitor events.  
 Clients can send and receive simple text messages, with a basic UI that will be improved.
 
 ### Usage:
-
-1) You need to install the pyfiglet module in order to run **run_server.py** script:  
-<code>pip install pyfiglet</code>
-
-
-2) To start the server:  
+To start the server:  
     <code>python run_server.py xxx.xxx.xxx.xxx yyyy</code> or  
     <code>python run_client.py xxx.xxx.xxx.xxx yyyy</code>, where:  
-    <code>xxx.xxx.xxx.xxx</code>: host IP  
-    <code>YYYY</code>: host port (integer).
-   
+    <code>xxx.xxx.xxx.xxx</code>: host IP,     <code>YYYY</code>: host port (integer).
+
 
 ### Tasks to-do:
-
-- [ ] Implement client functionalities:
-   - [ ] UI
-- [ ] Implement interactive functionalities for the console (modules to test):
-   - [ ] _cmd_ module
-   - [ ] _ctypes_ module for terminal manipulation (cursor position, etc)
+- Implement interactive functionalities for the console (modules to test):
+   - _cmd_ module
+   - _ctypes_ module for terminal manipulation (cursor position, etc)

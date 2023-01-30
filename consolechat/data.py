@@ -2,6 +2,9 @@ import json
 from datetime import datetime
 
 
+__all__ = ['sftp']
+
+
 class Protocol:
     @staticmethod
     def send_data(json_data: dict) -> str:

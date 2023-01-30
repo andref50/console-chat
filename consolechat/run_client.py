@@ -3,8 +3,10 @@ import sys
 import socket
 import threading
 
-from gui import ClientUI, Colors, MSG_TOKEN_DECORATOR
 from data import sftp
+from client_ui import client_ui
+from decorators import Colors, MSG_TOKEN_DECORATOR
+from client_ui_listener import setup_ui_event_handlers
 
 
 def receive() -> None:
@@ -57,9 +59,6 @@ if __name__ == "__main__":
               f"                YYYY: porta{Colors.WARNING}")
         sys.exit()
 
-    client_ui = ClientUI()
-    client_ui.start(150, 40)
-
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
@@ -72,7 +71,10 @@ if __name__ == "__main__":
         client.close()
         sys.exit()
 
-    client_ui.update()
+    clientui = client_ui
+
+    setup_ui_event_handlers()
+
     nickname = input("Nickname: ")
 
     receive_thread = threading.Thread(target=receive)
