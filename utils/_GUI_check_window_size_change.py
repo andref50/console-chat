@@ -1,5 +1,4 @@
 import os
-import threading
 
 MIN_WIDTH = 60
 MIN_HEIGHT = 30
@@ -23,9 +22,5 @@ def check_size_change():
             width = size[0]
             height = size[1]
 
-#
-# new_thread = threading.Thread(target=check_size_change)
-# new_thread.start()
-#
 
 check_size_change()

@@ -1,3 +1,4 @@
+import os
 import sys
 
 from ui import UI
@@ -21,15 +22,34 @@ class ServerUI(UI):
         self.host = str(sys.argv[1])
         self.port = int(sys.argv[2])
 
-        self._WIDTH = INIT_WIDTH
-        self._HEIGHT = INIT_HEIGHT
+        self.window_width = int()
+        self.window_height = int()
 
         # start the server
-        self.start(self._WIDTH, self._HEIGHT)
+        self.start(INIT_WIDTH, INIT_HEIGHT)
 
         self.update()
 
+    @staticmethod
+    def get_window_size():\
+        return os.get_terminal_size()
+
+    def header_banner(self):
+        line_size = self.get_window_size()[0]
+        title = f'{self.header_title} {__version__}'
+        print(f'╔{"═" * (line_size - 2)}╗')
+
+        print(f'║{" " * int(line_size - 2)}║')
+
+        print(f'║{" " * (int(line_size / 2) - int(len(title) /2) - 2)}'
+              f'{self.header_title} {__version__} '
+              f'{" " * (int(line_size / 2) - int(len(title) /2) - 2)}║')
+
+        print(f'║{" " * int(line_size - 2)}║')
+        print(f'╚{"═" * (line_size - 2)}╝')
+
     def header(self):
+        # self.header_banner()
         print(f"{self.header_title} {__version__}\n")
         print(f"{Colors.OKGREEN}* Conectado em {self.host}:{self.port}{Colors.ENDC}")
         print(f"* Usuários conectados: {len(clients_database)}")
