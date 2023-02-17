@@ -10,12 +10,12 @@ class Colors:
     UNDERLINE = '\033[4m'
 
 
-def separator(size):
-    print('-' * size)
-
-
 MSG_TOKEN_DECORATOR = {
     'conn': Colors.WARNING,
     'disconn': Colors.FAIL,
     'msg': Colors.ENDC
 }
+
+
+def separator(size):
+    print('-' * size)
