@@ -1,5 +1,5 @@
 import os
-from .canvas import Canvas
+from canvas import Canvas
 
 UNICODE_ARROWS = '←↑→↓↔↕↨'
 
@@ -200,3 +200,5 @@ box2 = TitledBox(
 app_canvas.add_element(box)
 app_canvas.add_element(box2)
 app_canvas.draw()
+
+

@@ -4,15 +4,15 @@ from server_ui import server_ui
 
 
 def handle_connect_client(*args):
-    server_ui.update()
+    server_ui._update()
 
 
 def handle_disconnect_client(*args):
-    server_ui.update()
+    server_ui._update()
 
 
 def handle_message(*args):
-    server_ui.update()
+    server_ui._update()
 
 
 def setup_ui_event_handlers():

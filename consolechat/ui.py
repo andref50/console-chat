@@ -3,7 +3,7 @@ import os
 
 class UI:
     """
-    Defines the ui used by the server_ui and client_ui classes.
+    Defines the ui base class used by the server_ui and client_ui classes.
     """
 
     def __init__(self):

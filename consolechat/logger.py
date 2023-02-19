@@ -3,8 +3,7 @@ __all__ = ['log']
 
 class Logger:
     """
-        The Logger object holds all the events in the server.
-        "max_events" set max events capacity (default is 100 events).
+        Logger object class holds all events created by the server.
     """
 
     def __init__(self, max_events: int = 100) -> None:

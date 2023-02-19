@@ -5,6 +5,8 @@ from ui import UI
 from logger import log
 from clients import clients_database
 from decorators import Colors, separator
+from ui_tools.canvas import Canvas
+# from ui_tools.boxes import Box
 
 from version import __version__
 
@@ -19,19 +21,30 @@ class ServerUI(UI):
         super().__init__()
         self.header_title = HEADER_TITLE
 
-        self.host = str(sys.argv[1])
-        self.port = int(sys.argv[2])
+        if len(sys.argv) == 3:
+            self.host = str(sys.argv[1])
+            self.port = int(sys.argv[2])
+        else:
+            print(f"{Colors.WARNING}\n"
+                  "* Uso:\n"
+                  "> run_server.py xxx.xxx.xxx.xxx YYYY, onde:\n\n"
+                  "     xxx.xxx.xxx.xxx: endereço IP\n"
+                  f"                YYYY: porta{Colors.WARNING}")
+            sys.exit()
 
         self.window_width = int()
         self.window_height = int()
 
+        self.canvas = Canvas(150, 40)
+
         # start the server
-        self.start(INIT_WIDTH, INIT_HEIGHT)
+        # self.start(INIT_WIDTH, INIT_HEIGHT)
+        self.start(self.canvas.width, self.canvas.height)
 
         self.update()
 
     @staticmethod
-    def get_window_size():\
+    def get_window_size():
         return os.get_terminal_size()
 
     def header_banner(self):

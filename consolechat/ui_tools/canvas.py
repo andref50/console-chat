@@ -1,33 +1,6 @@
 import os
 
 
-class ElementNotFitCanvas(Exception):
-    """ Element too big for this canvas """
-    def __init__(self, element_id):
-        self.element_id = element_id
-
-    def __str__(self):
-        return f'The {self.element_id} element is too big to fit this canvas'
-
-
-class ElementAlreadyInCanvas(Exception):
-    """ Element too big for this canvas """
-    def __init__(self, element_id):
-        self.element_id = element_id
-
-    def __str__(self):
-        return f'The {self.element_id} was already added in canvas'
-
-
-class ElementNotInCanvas(Exception):
-    """ Element too big for this canvas """
-    def __init__(self, element_id):
-        self.element_id = element_id
-
-    def __str__(self):
-        return f'The {self.element_id} is not in canvas'
-
-
 class Canvas:
     def __init__(self, width: int = None, height: int = None) -> None:
 
@@ -35,42 +8,49 @@ class Canvas:
         self.TERMINAL_WIDTH, self.TERMINAL_HEIGHT = os.get_terminal_size()
 
         # Validates box size, set to terminal size if greater than terminal bounds
-        self.width = width if width and width < self.TERMINAL_WIDTH else self.TERMINAL_WIDTH - 2
-        self.height = height if height and height< self.TERMINAL_HEIGHT else self.TERMINAL_HEIGHT - 5
+        self.width = width if width and width < self.TERMINAL_WIDTH else self.TERMINAL_WIDTH
+        self.height = height if height and height< self.TERMINAL_HEIGHT else self.TERMINAL_HEIGHT - 1
 
         self.elements = []
+        self.buffer = []
+
+        self.clear_buffer()
+
+    def gotoxy(self, col, row):
+        return self.buffer[row][col]
+
+    def print_at_buffer(self, char, col, row):
+        self.buffer[row][col] = char
 
     def add_element(self, element):
         if element not in self.elements:
-            try:
-                self._check_element_size(element)
-            except ElementNotFitCanvas:
-                print(ElementNotFitCanvas(element.id))
+            max_x_pos = self.width - element.width
+            max_y_pos = self.height - element.height - 2
+
+            element.x = min(element.x, max_x_pos)
+            element.y = min(element.y, max_y_pos)
             self.elements.append(element)
-        else:
-            raise ElementAlreadyInCanvas(element.id)
 
     def remove_element(self, element):
-        if element not in self.elements:
-            raise ElementNotInCanvas(element.id)
-        self.elements.remove(element)
+        if element in self.elements:
+            self.elements.remove(element)
 
-    def get_elements(self):
-        return self.elements
+    def clear_buffer(self):
+        self.buffer = list(['.' for _ in range(self.width)] for _ in range(self.height))
 
-    def _check_element_size(self, element) -> bool:
-        if element.width > self._free_width() or element.height > self._free_height():
-            raise ElementNotFitCanvas(element.id)
-        return True
+    def draw_to_buffer(self, element):
+        for row in range(len(element.box)):
+            for col in range(len(element.box[row])):
+                self.buffer[row + element.y][col + element.x] = element.box[row][col]
 
-    def _free_width(self) -> int:
-        return self.width - self._occupied_width()
+    def update(self):
+        self.clear_buffer()
+        for e in self.elements:
+            self.draw_to_buffer(e)
 
-    def _free_height(self) -> int:
-        return self.height - self._occupied_height()
+    def draw(self):
+        self.update()
+        print(''.join(j for i in self.buffer for j in i))
 
-    def _occupied_width(self) -> int:
-        return sum([element.width for element in self.elements])
 
-    def _occupied_height(self) -> int:
-        return sum([element.height for element in self.elements])
+canvas = Canvas()
